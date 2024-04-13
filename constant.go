@@ -24,11 +24,11 @@ var FieldList = []string{
 	"low_price",
 	"open_price",
 	"prev_close_price",
-	"base-currency-logoid",
-	"currency-logoid",
-	"currency_code", //USDT
-	"currency_id",   //XTVCUSDT
-	"base_currency_id",
+	"base_currency_id",     //base EUR  (EUR/USDT)
+	"base-currency-logoid", //base 图片地址(country/EU)
+	"currency_id",          //quote USD
+	"currency-logoid",      //country/US 这个是图片的地址
+	"currency_code",        //USD
 	"current_session",
 	"description", //具体pair的描述  TRON / TetherUS
 	"exchange",    //报价来源交易所  BINANCE
