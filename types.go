@@ -2,8 +2,8 @@ package tradingview
 
 // SocketInterface ...
 type SocketInterface interface {
-	AddSymbols(symbol []interface{}) error
-	RemoveSymbols(symbol []interface{}) error
+	AddSymbols(symbols []interface{}) error //symbol不需要添加来源exchange
+	RemoveSymbols(symbols []interface{}) error
 	Init() error
 	Close() error
 }

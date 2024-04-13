@@ -50,18 +50,10 @@ func TestExx_Signed(t *testing.T) {
 	if err != nil {
 		panic("Error while initializing the trading view socket -> " + err.Error())
 	}
-	//tradingviewsocket.AddSymbol("FPMARKETS:USDJPY")
-	//tradingviewsocket.AddSymbol("ICMARKETS:EURUSD")
-	//tradingviewsocket.AddSymbol("CAPITALCOM:EURUSD")
-	//tradingviewsocket.AddSymbol("OANDA:GBPUSD")
+
 	//STOCK
-	//tradingviewsocket.AddSymbol("NASDAQ:AAPL")
-	//CRYPTO
-	tradingviewsocket.AddSymbols([]interface{}{"BINANCE:DOGEUSDT", "BINANCE:BTCUSDT"})
-	//tradingviewsocket.AddSymbol("COINBASE:BTCUSDT")
-	//FOREX
-	//tradingviewsocket.AddSymbol("VANTAGE:USDJPY")
-	//tradingviewsocket.AddSymbol("ICE:USDJPY")
+	tradingviewsocket.AddSymbols([]interface{}{"AAPL"})
+	tradingviewsocket.AddSymbols([]interface{}{"DOGEUSDT", "BTCUSDT"})
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)

@@ -85,8 +85,18 @@ func (s *TradingViewWebSocket) AddSymbols(symbolList []interface{}) (err error) 
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	//批量订阅
-	symbols := append([]interface{}{s.sessionID}, symbolList...)
+	//1. 补充来源exchange
+	reSymbolIdList := make([]interface{}, 0)
+	for _, symbol := range symbolList {
+		symbolId := GetSymbolId(symbol.(string))
+		if len(symbolId) > 0 {
+			//说明存在
+			reSymbolIdList = append(reSymbolIdList, symbolId)
+		}
+	}
+
+	//2. 批量订阅
+	symbols := append([]interface{}{s.sessionID}, reSymbolIdList...)
 
 	err = s.sendSocketMessage(
 		getSocketMessage("quote_add_symbols", symbols),
