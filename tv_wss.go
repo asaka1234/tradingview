@@ -3,7 +3,6 @@ package tradingview
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/mitchellh/mapstructure"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 )
 
 // Socket ...
-type Socket struct {
+type TradingViewWebSocket struct {
 	address       string        //websocket地址
 	authTokenType AuthTokenType //初始化发送msg时需要指定token鉴权方式
 
@@ -32,7 +31,7 @@ func Connect(
 	onReceiveMarketDataCallback OnReceiveDataCallback,
 	onErrorCallback OnErrorCallback,
 ) (socket SocketInterface, err error) {
-	socket = &Socket{
+	socket = &TradingViewWebSocket{
 		address:                     address,
 		authTokenType:               authTokenType,
 		OnReceiveMarketDataCallback: onReceiveMarketDataCallback,
@@ -45,12 +44,11 @@ func Connect(
 }
 
 // Init connects to the tradingview web socket
-func (s *Socket) Init() (err error) {
+func (s *TradingViewWebSocket) Init() (err error) {
 	s.mx = sync.Mutex{}
 	s.isClosed = true
 	s.conn, _, err = (&websocket.Dialer{}).Dial(s.address, getHeaders())
 	if err != nil {
-		fmt.Printf("---123---------------\n")
 		s.onError(err, InitErrorContext)
 		return
 	}
@@ -77,13 +75,13 @@ func (s *Socket) Init() (err error) {
 }
 
 // Close ...
-func (s *Socket) Close() (err error) {
+func (s *TradingViewWebSocket) Close() (err error) {
 	s.isClosed = true
 	return s.conn.Close()
 }
 
 // AddSymbol ...
-func (s *Socket) AddSymbol(symbol string) (err error) {
+func (s *TradingViewWebSocket) AddSymbol(symbol string) (err error) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 	err = s.sendSocketMessage(
@@ -97,7 +95,7 @@ func (s *Socket) AddSymbol(symbol string) (err error) {
 }
 
 // RemoveSymbol ...
-func (s *Socket) RemoveSymbol(symbol string) (err error) {
+func (s *TradingViewWebSocket) RemoveSymbol(symbol string) (err error) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 	err = s.sendSocketMessage(
@@ -106,7 +104,7 @@ func (s *Socket) RemoveSymbol(symbol string) (err error) {
 	return
 }
 
-func (s *Socket) checkFirstReceivedMessage() (err error) {
+func (s *TradingViewWebSocket) checkFirstReceivedMessage() (err error) {
 	var msg []byte
 
 	_, msg, err = s.conn.ReadMessage()
@@ -136,11 +134,11 @@ func (s *Socket) checkFirstReceivedMessage() (err error) {
 }
 
 // 要发一个
-func (s *Socket) generateSessionID() {
+func (s *TradingViewWebSocket) generateSessionID() {
 	s.sessionID = "qs_" + GetRandomString(12)
 }
 
-func (s *Socket) sendConnectionSetupMessages() (err error) {
+func (s *TradingViewWebSocket) sendConnectionSetupMessages() (err error) {
 
 	//指定一下要获取哪些字段
 	fields := []string{s.sessionID}
@@ -172,7 +170,7 @@ func (s *Socket) sendConnectionSetupMessages() (err error) {
 	return
 }
 
-func (s *Socket) sendSocketMessage(p *SocketMessage) (err error) {
+func (s *TradingViewWebSocket) sendSocketMessage(p *SocketMessage) (err error) {
 	payload, _ := json.Marshal(p)
 	payloadWithHeader := "~m~" + strconv.Itoa(len(payload)) + "~m~" + string(payload)
 
@@ -184,7 +182,7 @@ func (s *Socket) sendSocketMessage(p *SocketMessage) (err error) {
 	return
 }
 
-func (s *Socket) connectionLoop() {
+func (s *TradingViewWebSocket) connectionLoop() {
 	var readMsgError error
 	var writeKeepAliveMsgError error
 
@@ -221,7 +219,7 @@ func (s *Socket) connectionLoop() {
 }
 
 // 负责解析收到的数据
-func (s *Socket) parsePacket(packet []byte) {
+func (s *TradingViewWebSocket) parsePacket(packet []byte) {
 	var symbolsArr []string
 	var dataArr []*QuoteData
 
@@ -265,7 +263,7 @@ func (s *Socket) parsePacket(packet []byte) {
 	}
 }
 
-func (s *Socket) parseJSON(msg []byte) (symbol string, data *QuoteData, err error) {
+func (s *TradingViewWebSocket) parseJSON(msg []byte) (symbol string, data *QuoteData, err error) {
 	var decodedMessage *SocketMessage
 
 	err = json.Unmarshal(msg, &decodedMessage)
@@ -274,7 +272,7 @@ func (s *Socket) parseJSON(msg []byte) (symbol string, data *QuoteData, err erro
 		return
 	}
 
-	fmt.Printf("-----result------%+v\n", decodedMessage)
+	//fmt.Printf("-----result------%+v\n", decodedMessage)
 
 	if decodedMessage.Message == "critical_error" || decodedMessage.Message == "error" {
 		err = errors.New("Error -> " + string(msg))
@@ -321,7 +319,7 @@ func (s *Socket) parseJSON(msg []byte) (symbol string, data *QuoteData, err erro
 	return
 }
 
-func (s *Socket) onError(err error, context string) {
+func (s *TradingViewWebSocket) onError(err error, context string) {
 	if s.conn != nil {
 		s.conn.Close()
 	}
