@@ -1,6 +1,7 @@
 package tradingview
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -13,8 +14,9 @@ func TestExx_Signed(t *testing.T) {
 		DataWssAddress,                     //WidgetDataWssAddress,         //wss地址
 		AuthTokenTypeUnauthorizedUserToken, //AuthTokenTypeWidgetUserToken, //鉴权方式
 		func(symbol string, data *QuoteData) {
-			fmt.Printf("%s\n", symbol)
-			fmt.Printf("%+v\n", data)
+			fmt.Printf("symbol:%s\n", symbol)
+			resp1, _ := json.Marshal(data)
+			fmt.Printf("respose:%s\n", string(resp1))
 
 			if data.Price != nil {
 				fmt.Printf("price=%f\n", *data.Price)
