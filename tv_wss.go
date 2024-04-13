@@ -81,25 +81,33 @@ func (s *TradingViewWebSocket) Close() (err error) {
 }
 
 // AddSymbol ...
-func (s *TradingViewWebSocket) AddSymbol(symbol string) (err error) {
+func (s *TradingViewWebSocket) AddSymbols(symbolList []interface{}) (err error) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
+
+	//批量订阅
+	symbols := append([]interface{}{s.sessionID}, symbolList...)
+
 	err = s.sendSocketMessage(
-		getSocketMessage("quote_add_symbols", []interface{}{s.sessionID, symbol}),
+		getSocketMessage("quote_add_symbols", symbols),
 	)
 	//单独加一下这个
 	err = s.sendSocketMessage(
-		getSocketMessage("quote_fast_symbols", []interface{}{s.sessionID, symbol}),
+		getSocketMessage("quote_fast_symbols", symbols),
 	)
 	return
 }
 
 // RemoveSymbol ...
-func (s *TradingViewWebSocket) RemoveSymbol(symbol string) (err error) {
+func (s *TradingViewWebSocket) RemoveSymbols(symbolList []interface{}) (err error) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
+
+	//批量解除订阅
+	symbols := append([]interface{}{s.sessionID}, symbolList...)
+
 	err = s.sendSocketMessage(
-		getSocketMessage("quote_remove_symbols", []interface{}{s.sessionID, symbol}),
+		getSocketMessage("quote_remove_symbols", symbols),
 	)
 	return
 }

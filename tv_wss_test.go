@@ -57,7 +57,7 @@ func TestExx_Signed(t *testing.T) {
 	//STOCK
 	//tradingviewsocket.AddSymbol("NASDAQ:AAPL")
 	//CRYPTO
-	tradingviewsocket.AddSymbol("BINANCE:DOGEUSDT")
+	tradingviewsocket.AddSymbols([]interface{}{"BINANCE:DOGEUSDT", "BINANCE:BTCUSDT"})
 	//tradingviewsocket.AddSymbol("COINBASE:BTCUSDT")
 	//FOREX
 	//tradingviewsocket.AddSymbol("VANTAGE:USDJPY")
